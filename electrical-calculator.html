@@ -6,321 +6,167 @@
   <title>Electrical Calculator</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #0f172a;
-      --surface: #1e293b;
-      --border: #334155;
-      --accent: #38bdf8;
-      --accent2: #818cf8;
-      --accent3: #34d399;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --danger: #f87171;
-      --warn: #fbbf24;
-      --radius: 12px;
+      --bg: #0f172a; --surface: #1e293b; --border: #334155;
+      --accent: #38bdf8; --accent2: #818cf8; --accent3: #34d399;
+      --accent4: #fb923c; --accent5: #f472b6;
+      --text: #f1f5f9; --muted: #94a3b8; --warn: #fbbf24; --radius: 12px;
     }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 16px; }
+    header { text-align: center; margin-bottom: 20px; }
+    header h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+    header p { color: var(--muted); font-size: 0.82rem; margin-top: 4px; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 16px;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    header h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-    header p { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
-
-    /* Tabs */
+    /* Scrollable tab bar */
+    .tabs-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 18px; padding-bottom: 2px; }
+    .tabs-wrap::-webkit-scrollbar { height: 3px; }
+    .tabs-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
     .tabs {
-      display: flex;
-      gap: 6px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 4px;
-      margin-bottom: 20px;
+      display: flex; gap: 6px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 4px; width: max-content; min-width: 100%;
     }
     .tab-btn {
-      flex: 1;
-      padding: 8px 4px;
-      background: transparent;
-      border: none;
-      border-radius: 8px;
-      color: var(--muted);
-      font-size: 0.72rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      line-height: 1.3;
-      text-align: center;
+      flex-shrink: 0; padding: 8px 12px; background: transparent; border: none;
+      border-radius: 8px; color: var(--muted); font-size: 0.72rem; font-weight: 600;
+      cursor: pointer; transition: all 0.18s; line-height: 1.3; text-align: center; white-space: nowrap;
     }
-    .tab-btn.active {
-      color: var(--bg);
-      background: var(--accent);
-    }
+    .tab-btn.active { color: var(--bg); background: var(--accent); }
     .tab-btn:not(.active):hover { color: var(--text); background: var(--border); }
 
-    /* Panels */
-    .panel { display: none; }
-    .panel.active { display: block; }
+    .panel { display: none; } .panel.active { display: block; }
 
-    /* Card */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-    .card h2 {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .badge {
-      font-size: 0.7rem;
-      padding: 2px 8px;
-      border-radius: 99px;
-      font-weight: 600;
-    }
-    .badge-blue { background: #0ea5e940; color: var(--accent); }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; }
+    .card h2 { font-size: 0.95rem; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .badge { font-size: 0.68rem; padding: 2px 8px; border-radius: 99px; font-weight: 600; }
+    .badge-blue   { background: #0ea5e940; color: var(--accent); }
     .badge-purple { background: #818cf840; color: var(--accent2); }
-    .badge-green { background: #34d39940; color: var(--accent3); }
+    .badge-green  { background: #34d39940; color: var(--accent3); }
+    .badge-orange { background: #fb923c40; color: var(--accent4); }
+    .badge-pink   { background: #f472b640; color: var(--accent5); }
+    .badge-warn   { background: #fbbf2440; color: var(--warn); }
 
-    /* Form */
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
     .form-row.single { grid-template-columns: 1fr; }
     .form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
 
-    label {
-      display: block;
-      font-size: 0.75rem;
-      color: var(--muted);
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
+    label { display: block; font-size: 0.73rem; color: var(--muted); margin-bottom: 4px; font-weight: 500; }
     input[type="number"], select {
-      width: 100%;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      padding: 10px 12px;
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color 0.2s;
-      -webkit-appearance: none;
-      appearance: none;
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); padding: 9px 11px; font-size: 0.88rem;
+      outline: none; transition: border-color 0.18s; -webkit-appearance: none; appearance: none;
     }
     input[type="number"]:focus, select:focus { border-color: var(--accent); }
-
     select {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      padding-right: 36px;
+      background-repeat: no-repeat; background-position: right 11px center; padding-right: 34px;
     }
 
-    .btn {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      margin-top: 4px;
-    }
+    .btn { width: 100%; padding: 11px; border: none; border-radius: 8px; font-size: 0.92rem; font-weight: 700; cursor: pointer; transition: opacity 0.18s, transform 0.1s; margin-top: 4px; }
     .btn:active { transform: scale(0.98); }
-    .btn-blue { background: var(--accent); color: var(--bg); }
+    .btn:hover { opacity: 0.85; }
+    .btn-blue   { background: var(--accent);  color: var(--bg); }
     .btn-purple { background: var(--accent2); color: var(--bg); }
-    .btn-green { background: var(--accent3); color: var(--bg); }
-    .btn:hover { opacity: 0.88; }
+    .btn-green  { background: var(--accent3); color: var(--bg); }
+    .btn-orange { background: var(--accent4); color: var(--bg); }
+    .btn-pink   { background: var(--accent5); color: var(--bg); }
+    .btn-warn   { background: var(--warn);    color: var(--bg); }
 
-    /* Result box */
-    .result {
-      display: none;
-      margin-top: 16px;
-      border-radius: 10px;
-      padding: 16px;
-      border-left: 4px solid var(--accent);
-      background: #0ea5e910;
-    }
+    .result { display: none; margin-top: 14px; border-radius: 10px; padding: 14px; border-left: 4px solid var(--accent); background: #0ea5e910; }
     .result.show { display: block; }
     .result.purple { border-left-color: var(--accent2); background: #818cf810; }
-    .result.green { border-left-color: var(--accent3); background: #34d39910; }
-    .result.warn { border-left-color: var(--warn); background: #fbbf2410; }
+    .result.green  { border-left-color: var(--accent3); background: #34d39910; }
+    .result.orange { border-left-color: var(--accent4); background: #fb923c10; }
+    .result.pink   { border-left-color: var(--accent5); background: #f472b610; }
+    .result.warn   { border-left-color: var(--warn);    background: #fbbf2410; }
 
-    .result-main {
-      font-size: 1.6rem;
-      font-weight: 800;
-      line-height: 1.1;
-    }
-    .result-sub {
-      color: var(--muted);
-      font-size: 0.8rem;
-      margin-top: 6px;
-      line-height: 1.5;
-    }
+    .result-main { font-size: 1.55rem; font-weight: 800; line-height: 1.1; }
+    .result-sub  { color: var(--muted); font-size: 0.78rem; margin-top: 5px; line-height: 1.5; }
 
-    /* Detail rows */
-    .detail-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    .detail-item {
-      background: var(--bg);
-      border-radius: 8px;
-      padding: 10px;
-    }
-    .detail-label { font-size: 0.7rem; color: var(--muted); margin-bottom: 2px; }
-    .detail-value { font-size: 0.95rem; font-weight: 700; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 10px; }
+    .detail-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+    .detail-item { background: var(--bg); border-radius: 8px; padding: 9px; }
+    .detail-label { font-size: 0.68rem; color: var(--muted); margin-bottom: 2px; }
+    .detail-value { font-size: 0.92rem; font-weight: 700; }
 
-    /* Info boxes */
-    .info-box {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
-      margin-top: 12px;
-      font-size: 0.78rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
+    .info-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 11px; margin-top: 10px; font-size: 0.76rem; color: var(--muted); line-height: 1.6; }
     .info-box strong { color: var(--text); }
 
-    /* Breaker table */
-    .breaker-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 0.8rem;
-    }
-    .breaker-table th, .breaker-table td {
-      padding: 7px 10px;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-    }
-    .breaker-table th { color: var(--muted); font-weight: 600; font-size: 0.72rem; }
-    .breaker-table tr.highlight td { color: var(--accent3); font-weight: 700; background: #34d39910; }
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.78rem; }
+    .data-table th, .data-table td { padding: 7px 9px; text-align: left; border-bottom: 1px solid var(--border); }
+    .data-table th { color: var(--muted); font-weight: 600; font-size: 0.7rem; }
+    .data-table tr.highlight td { color: var(--accent3); font-weight: 700; background: #34d39910; }
 
-    .tag {
-      display: inline-block;
-      font-size: 0.65rem;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: var(--accent3);
-      color: var(--bg);
-      font-weight: 700;
-      margin-left: 4px;
-    }
+    .tag { display: inline-block; font-size: 0.63rem; padding: 2px 5px; border-radius: 4px; background: var(--accent3); color: var(--bg); font-weight: 700; margin-left: 4px; }
 
-    footer {
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.72rem;
-      margin-top: 24px;
-      padding-bottom: 8px;
-      line-height: 1.6;
-    }
+    /* Ohm's Law wheel */
+    .ohm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+    .ohm-field { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
+    .ohm-field label { font-size: 0.7rem; }
+    .ohm-field input { background: transparent; border: none; border-bottom: 1px solid var(--border); border-radius: 0; padding: 4px 0; font-size: 1rem; font-weight: 700; }
+    .ohm-field input:focus { border-bottom-color: var(--accent); outline: none; }
+    .ohm-field .unit { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+
+    footer { text-align: center; color: var(--muted); font-size: 0.7rem; margin-top: 22px; padding-bottom: 8px; line-height: 1.6; }
   </style>
 </head>
 <body>
 
 <header>
   <h1>⚡ Electrical Calculator</h1>
-  <p>Cable sizing · kW→kVA · Breaker sizing</p>
+  <p>Cable · Breaker · kW/kVA · Ohm's Law · Motor · Transformer · Conversions</p>
 </header>
 
-<div class="tabs">
-  <button class="tab-btn active" onclick="showTab('cable')">🔌 Cable<br>Sizer</button>
-  <button class="tab-btn" onclick="showTab('kva')">⚡ kW→<br>kVA</button>
-  <button class="tab-btn" onclick="showTab('breaker')">🔒 Breaker<br>Size</button>
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('cable',this)">🔌 Cable<br>Sizer</button>
+    <button class="tab-btn" onclick="showTab('breaker',this)">🔒 Breaker<br>Size</button>
+    <button class="tab-btn" onclick="showTab('kva',this)">⚡ kW ↔<br>kVA</button>
+    <button class="tab-btn" onclick="showTab('ohm',this)">🔵 Ohm's<br>Law</button>
+    <button class="tab-btn" onclick="showTab('motor',this)">🔧 Motor<br>FLC</button>
+    <button class="tab-btn" onclick="showTab('transformer',this)">🔁 Trans-<br>former</button>
+    <button class="tab-btn" onclick="showTab('convert',this)">🔄 More<br>Conversions</button>
+  </div>
 </div>
 
-<!-- ─── CABLE SIZER ─── -->
+<!-- ══════════════ CABLE SIZER ══════════════ -->
 <div id="panel-cable" class="panel active">
   <div class="card">
     <h2>Cable Size Calculator <span class="badge badge-blue">mm²</span></h2>
-
     <div class="form-row">
-      <div>
-        <label>System Type</label>
+      <div><label>System Type</label>
         <select id="c-system">
           <option value="single">Single-phase (1Ø)</option>
           <option value="three">Three-phase (3Ø)</option>
           <option value="dc">DC</option>
-        </select>
-      </div>
-      <div>
-        <label>Voltage (V)</label>
-        <input type="number" id="c-voltage" value="230" min="1" />
-      </div>
+        </select></div>
+      <div><label>Voltage (V)</label><input type="number" id="c-voltage" value="230" min="1" /></div>
     </div>
-
     <div class="form-row">
-      <div>
-        <label>Load (kW)</label>
-        <input type="number" id="c-kw" value="5" min="0.01" step="0.1" />
-      </div>
-      <div>
-        <label>Power Factor</label>
-        <input type="number" id="c-pf" value="0.85" min="0.1" max="1" step="0.01" />
-      </div>
+      <div><label>Load (kW)</label><input type="number" id="c-kw" value="5" min="0.01" step="0.1" /></div>
+      <div><label>Power Factor</label><input type="number" id="c-pf" value="0.85" min="0.1" max="1" step="0.01" /></div>
     </div>
-
     <div class="form-row">
-      <div>
-        <label>Cable Run (m)</label>
-        <input type="number" id="c-length" value="30" min="1" />
-      </div>
-      <div>
-        <label>Max Volt Drop (%)</label>
-        <input type="number" id="c-vd" value="3" min="0.5" max="10" step="0.5" />
-      </div>
+      <div><label>Cable Run (m)</label><input type="number" id="c-length" value="30" min="1" /></div>
+      <div><label>Max Volt Drop (%)</label><input type="number" id="c-vd" value="3" min="0.5" max="10" step="0.5" /></div>
     </div>
-
     <div class="form-row">
-      <div>
-        <label>Conductor</label>
+      <div><label>Conductor</label>
         <select id="c-material">
           <option value="cu">Copper (Cu)</option>
           <option value="al">Aluminium (Al)</option>
-        </select>
-      </div>
-      <div>
-        <label>Installation</label>
+        </select></div>
+      <div><label>Installation</label>
         <select id="c-install">
           <option value="conduit">In conduit</option>
           <option value="free">Free air</option>
           <option value="buried">Direct buried</option>
-        </select>
-      </div>
+        </select></div>
     </div>
-
     <button class="btn btn-blue" onclick="calcCable()">Calculate Cable Size</button>
-
     <div class="result" id="cable-result">
       <div class="result-main" id="cable-size-text">—</div>
       <div class="result-sub" id="cable-sub-text"></div>
@@ -330,107 +176,38 @@
   </div>
 </div>
 
-<!-- ─── kW to kVA ─── -->
-<div id="panel-kva" class="panel">
-  <div class="card">
-    <h2>kW ↔ kVA Converter <span class="badge badge-purple">PF</span></h2>
-
-    <div class="form-row single">
-      <div>
-        <label>Conversion Direction</label>
-        <select id="kva-dir">
-          <option value="kw2kva">kW → kVA</option>
-          <option value="kva2kw">kVA → kW</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div>
-        <label id="kva-input-label">Real Power (kW)</label>
-        <input type="number" id="kva-input" value="10" min="0.01" step="0.1" />
-      </div>
-      <div>
-        <label>Power Factor (0–1)</label>
-        <input type="number" id="kva-pf" value="0.85" min="0.01" max="1" step="0.01" />
-      </div>
-    </div>
-
-    <button class="btn btn-purple" onclick="calcKva()">Convert</button>
-
-    <div class="result purple" id="kva-result">
-      <div class="result-main" id="kva-output-text">—</div>
-      <div class="result-sub" id="kva-sub-text"></div>
-      <div class="detail-grid" id="kva-details"></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>Common Power Factor Reference</h2>
-    <div class="info-box" style="margin-top:0">
-      <strong>Motor (loaded):</strong> 0.85–0.92<br/>
-      <strong>Motor (unloaded):</strong> 0.3–0.5<br/>
-      <strong>Resistive (heaters):</strong> 1.0<br/>
-      <strong>Fluorescent lighting:</strong> 0.5–0.9<br/>
-      <strong>UPS/Computers:</strong> 0.6–0.7<br/>
-      <strong>Welding equipment:</strong> 0.35–0.6<br/>
-      <strong>General mixed load:</strong> 0.80–0.85
-    </div>
-  </div>
-</div>
-
-<!-- ─── BREAKER SIZER ─── -->
+<!-- ══════════════ BREAKER ══════════════ -->
 <div id="panel-breaker" class="panel">
   <div class="card">
     <h2>Breaker Size Suggestion <span class="badge badge-green">NEC/IEC</span></h2>
-
     <div class="form-row">
-      <div>
-        <label>System Type</label>
+      <div><label>System Type</label>
         <select id="b-system">
           <option value="single">Single-phase (1Ø)</option>
           <option value="three">Three-phase (3Ø)</option>
           <option value="dc">DC</option>
-        </select>
-      </div>
-      <div>
-        <label>Voltage (V)</label>
-        <input type="number" id="b-voltage" value="230" min="1" />
-      </div>
+        </select></div>
+      <div><label>Voltage (V)</label><input type="number" id="b-voltage" value="230" min="1" /></div>
     </div>
-
     <div class="form-row">
-      <div>
-        <label>Load (kW)</label>
-        <input type="number" id="b-kw" value="5" min="0.01" step="0.1" />
-      </div>
-      <div>
-        <label>Power Factor</label>
-        <input type="number" id="b-pf" value="0.85" min="0.1" max="1" step="0.01" />
-      </div>
+      <div><label>Load (kW)</label><input type="number" id="b-kw" value="5" min="0.01" step="0.1" /></div>
+      <div><label>Power Factor</label><input type="number" id="b-pf" value="0.85" min="0.1" max="1" step="0.01" /></div>
     </div>
-
     <div class="form-row">
-      <div>
-        <label>Load Type</label>
+      <div><label>Load Type</label>
         <select id="b-loadtype">
           <option value="general">General / Lighting</option>
           <option value="motor">Motor (continuous)</option>
-          <option value="hvac">HVAC</option>
+          <option value="hvac">HVAC / Hermetic</option>
           <option value="resistive">Resistive (heater)</option>
-        </select>
-      </div>
-      <div>
-        <label>Breaker Standard</label>
+        </select></div>
+      <div><label>Standard</label>
         <select id="b-standard">
-          <option value="iec">IEC (common sizes)</option>
-          <option value="nec">NEC (NEMA sizes)</option>
-        </select>
-      </div>
+          <option value="iec">IEC sizes</option>
+          <option value="nec">NEC (NEMA) sizes</option>
+        </select></div>
     </div>
-
     <button class="btn btn-green" onclick="calcBreaker()">Suggest Breaker</button>
-
     <div class="result green" id="breaker-result">
       <div class="result-main" id="breaker-size-text">—</div>
       <div class="result-sub" id="breaker-sub-text"></div>
@@ -440,180 +217,650 @@
   </div>
 </div>
 
+<!-- ══════════════ kW ↔ kVA ══════════════ -->
+<div id="panel-kva" class="panel">
+  <div class="card">
+    <h2>kW ↔ kVA Converter <span class="badge badge-purple">PF</span></h2>
+    <div class="form-row single">
+      <div><label>Direction</label>
+        <select id="kva-dir" onchange="updateKvaLabel()">
+          <option value="kw2kva">kW → kVA</option>
+          <option value="kva2kw">kVA → kW</option>
+        </select></div>
+    </div>
+    <div class="form-row">
+      <div><label id="kva-input-label">Real Power (kW)</label><input type="number" id="kva-input" value="10" min="0.01" step="0.1" /></div>
+      <div><label>Power Factor</label><input type="number" id="kva-pf" value="0.85" min="0.01" max="1" step="0.01" /></div>
+    </div>
+    <button class="btn btn-purple" onclick="calcKva()">Convert</button>
+    <div class="result purple" id="kva-result">
+      <div class="result-main" id="kva-output-text">—</div>
+      <div class="result-sub" id="kva-sub-text"></div>
+      <div class="detail-grid" id="kva-details"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Power Factor Reference</h2>
+    <div class="info-box" style="margin-top:0">
+      <strong>Motor (loaded):</strong> 0.85–0.92 &nbsp;·&nbsp; <strong>Motor (unloaded):</strong> 0.3–0.5<br/>
+      <strong>Resistive heaters:</strong> 1.0 &nbsp;·&nbsp; <strong>Fluorescent:</strong> 0.5–0.9<br/>
+      <strong>UPS / Computers:</strong> 0.6–0.7 &nbsp;·&nbsp; <strong>Welding:</strong> 0.35–0.6<br/>
+      <strong>General mixed load:</strong> 0.80–0.85
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ OHM'S LAW ══════════════ -->
+<div id="panel-ohm" class="panel">
+  <div class="card">
+    <h2>Ohm's Law Calculator <span class="badge badge-orange">V · I · R · P</span></h2>
+    <p style="font-size:0.76rem;color:var(--muted);margin-bottom:12px">Enter any <strong style="color:var(--text)">two</strong> values — leave the others blank. The unknowns will be calculated.</p>
+    <div class="ohm-grid">
+      <div class="ohm-field">
+        <label>Voltage</label>
+        <input type="number" id="o-v" placeholder="—" min="0" step="any" />
+        <div class="unit">V (Volts)</div>
+      </div>
+      <div class="ohm-field">
+        <label>Current</label>
+        <input type="number" id="o-i" placeholder="—" min="0" step="any" />
+        <div class="unit">A (Amps)</div>
+      </div>
+      <div class="ohm-field">
+        <label>Resistance</label>
+        <input type="number" id="o-r" placeholder="—" min="0" step="any" />
+        <div class="unit">Ω (Ohms)</div>
+      </div>
+      <div class="ohm-field">
+        <label>Power</label>
+        <input type="number" id="o-p" placeholder="—" min="0" step="any" />
+        <div class="unit">W (Watts)</div>
+      </div>
+    </div>
+    <button class="btn btn-orange" onclick="calcOhm()">Calculate</button>
+    <button class="btn" style="background:var(--border);color:var(--text);margin-top:6px" onclick="clearOhm()">Clear All</button>
+    <div class="result orange" id="ohm-result">
+      <div class="detail-grid" id="ohm-details"></div>
+      <div class="info-box" id="ohm-info"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Ohm's Law Formulas</h2>
+    <div class="info-box" style="margin-top:0">
+      <strong>V = I × R</strong> &nbsp;·&nbsp; <strong>I = V / R</strong> &nbsp;·&nbsp; <strong>R = V / I</strong><br/>
+      <strong>P = V × I</strong> &nbsp;·&nbsp; <strong>P = I² × R</strong> &nbsp;·&nbsp; <strong>P = V² / R</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MOTOR FLC ══════════════ -->
+<div id="panel-motor" class="panel">
+  <div class="card">
+    <h2>Motor Full Load Current <span class="badge badge-pink">FLC</span></h2>
+    <div class="form-row">
+      <div><label>Input Type</label>
+        <select id="m-inputtype" onchange="toggleMotorInput()">
+          <option value="kw">Power in kW</option>
+          <option value="hp">Power in HP</option>
+        </select></div>
+      <div><label id="m-power-label">Motor Power (kW)</label><input type="number" id="m-power" value="7.5" min="0.01" step="0.1" /></div>
+    </div>
+    <div class="form-row">
+      <div><label>System</label>
+        <select id="m-system">
+          <option value="three">Three-phase (3Ø)</option>
+          <option value="single">Single-phase (1Ø)</option>
+        </select></div>
+      <div><label>Voltage (V)</label><input type="number" id="m-voltage" value="415" min="1" /></div>
+    </div>
+    <div class="form-row">
+      <div><label>Motor Efficiency (%)</label><input type="number" id="m-eff" value="90" min="1" max="100" step="1" /></div>
+      <div><label>Power Factor</label><input type="number" id="m-pf" value="0.85" min="0.1" max="1" step="0.01" /></div>
+    </div>
+    <button class="btn btn-pink" onclick="calcMotor()">Calculate FLC</button>
+    <div class="result pink" id="motor-result">
+      <div class="result-main" id="motor-flc-text">—</div>
+      <div class="result-sub" id="motor-sub-text"></div>
+      <div class="detail-grid" id="motor-details"></div>
+      <div class="info-box" id="motor-info"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Motor Starting Current</h2>
+    <div class="info-box" style="margin-top:0">
+      <strong>DOL start:</strong> 6–8× FLC<br/>
+      <strong>Star-Delta start:</strong> 2–2.5× FLC<br/>
+      <strong>Soft starter:</strong> 2–4× FLC<br/>
+      <strong>VFD:</strong> ~1× FLC (smooth ramp)
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TRANSFORMER ══════════════ -->
+<div id="panel-transformer" class="panel">
+  <div class="card">
+    <h2>Transformer Sizing <span class="badge badge-warn">kVA</span></h2>
+    <div class="form-row">
+      <div><label>Total Load (kW)</label><input type="number" id="t-kw" value="50" min="0.01" step="1" /></div>
+      <div><label>Power Factor</label><input type="number" id="t-pf" value="0.85" min="0.1" max="1" step="0.01" /></div>
+    </div>
+    <div class="form-row">
+      <div><label>Demand Factor (%)</label><input type="number" id="t-df" value="80" min="1" max="100" step="1" /></div>
+      <div><label>Future Growth (%)</label><input type="number" id="t-growth" value="25" min="0" max="200" step="5" /></div>
+    </div>
+    <div class="form-row">
+      <div><label>Primary Voltage (V)</label><input type="number" id="t-vpri" value="11000" min="1" /></div>
+      <div><label>Secondary Voltage (V)</label><input type="number" id="t-vsec" value="415" min="1" /></div>
+    </div>
+    <button class="btn btn-warn" onclick="calcTransformer()">Size Transformer</button>
+    <div class="result warn" id="transformer-result">
+      <div class="result-main" id="transformer-kva-text">—</div>
+      <div class="result-sub" id="transformer-sub-text"></div>
+      <div class="detail-grid" id="transformer-details"></div>
+      <div class="info-box" id="transformer-info"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Standard Transformer Sizes (kVA)</h2>
+    <div class="info-box" style="margin-top:0">
+      5 · 10 · 15 · 25 · 37.5 · 50 · 75 · 100 · 150 · 200 · 250 · 315 · 500 · 630 · 750 · 1000 · 1250 · 1600 · 2000 · 2500
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MORE CONVERSIONS ══════════════ -->
+<div id="panel-convert" class="panel">
+
+  <!-- HP ↔ kW -->
+  <div class="card">
+    <h2>HP ↔ kW <span class="badge badge-blue">Power</span></h2>
+    <div class="form-row">
+      <div><label>Direction</label>
+        <select id="hp-dir" onchange="updateHpLabel()">
+          <option value="hp2kw">HP → kW</option>
+          <option value="kw2hp">kW → HP</option>
+        </select></div>
+      <div><label id="hp-input-label">Horsepower (HP)</label><input type="number" id="hp-input" value="10" min="0.01" step="0.1" /></div>
+    </div>
+    <button class="btn btn-blue" onclick="calcHp()">Convert</button>
+    <div class="result" id="hp-result">
+      <div class="result-main" id="hp-output-text">—</div>
+      <div class="detail-grid" id="hp-details"></div>
+    </div>
+  </div>
+
+  <!-- kW / kVA to Amps -->
+  <div class="card">
+    <h2>kW / kVA → Amps <span class="badge badge-green">Current</span></h2>
+    <div class="form-row">
+      <div><label>Input Type</label>
+        <select id="amp-type">
+          <option value="kw">kW (real power)</option>
+          <option value="kva">kVA (apparent)</option>
+          <option value="amps">Amps → kW</option>
+        </select></div>
+      <div><label>System</label>
+        <select id="amp-system">
+          <option value="single">Single-phase</option>
+          <option value="three">Three-phase</option>
+          <option value="dc">DC</option>
+        </select></div>
+    </div>
+    <div class="form-row">
+      <div><label>Value</label><input type="number" id="amp-val" value="10" min="0.01" step="0.1" /></div>
+      <div><label>Voltage (V)</label><input type="number" id="amp-v" value="230" min="1" /></div>
+    </div>
+    <div class="form-row single">
+      <div><label>Power Factor</label><input type="number" id="amp-pf" value="0.85" min="0.01" max="1" step="0.01" /></div>
+    </div>
+    <button class="btn btn-green" onclick="calcAmps()">Convert</button>
+    <div class="result green" id="amp-result">
+      <div class="result-main" id="amp-output-text">—</div>
+      <div class="detail-grid" id="amp-details"></div>
+    </div>
+  </div>
+
+  <!-- Efficiency -->
+  <div class="card">
+    <h2>Electrical Efficiency <span class="badge badge-purple">η%</span></h2>
+    <div class="form-row">
+      <div><label>Input Power (W or kW)</label><input type="number" id="eff-in" value="1000" min="0.01" step="1" /></div>
+      <div><label>Output Power (same unit)</label><input type="number" id="eff-out" value="900" min="0.01" step="1" /></div>
+    </div>
+    <button class="btn btn-purple" onclick="calcEff()">Calculate Efficiency</button>
+    <div class="result purple" id="eff-result">
+      <div class="result-main" id="eff-output-text">—</div>
+      <div class="detail-grid" id="eff-details"></div>
+    </div>
+  </div>
+
+  <!-- kVAR / Capacitor -->
+  <div class="card">
+    <h2>PF Correction (kVAR) <span class="badge badge-orange">Capacitor</span></h2>
+    <div class="form-row">
+      <div><label>Load (kW)</label><input type="number" id="cap-kw" value="100" min="0.01" step="1" /></div>
+      <div><label>Existing PF</label><input type="number" id="cap-pf1" value="0.75" min="0.1" max="1" step="0.01" /></div>
+    </div>
+    <div class="form-row single">
+      <div><label>Target PF</label><input type="number" id="cap-pf2" value="0.95" min="0.1" max="1" step="0.01" /></div>
+    </div>
+    <button class="btn btn-orange" onclick="calcCapacitor()">Calculate kVAR</button>
+    <div class="result orange" id="cap-result">
+      <div class="result-main" id="cap-output-text">—</div>
+      <div class="result-sub" id="cap-sub-text"></div>
+      <div class="detail-grid" id="cap-details"></div>
+    </div>
+  </div>
+
+  <!-- Voltage Drop (quick) -->
+  <div class="card">
+    <h2>Quick Voltage Drop <span class="badge badge-pink">%VD</span></h2>
+    <div class="form-row">
+      <div><label>Current (A)</label><input type="number" id="vd-i" value="20" min="0.01" step="0.1" /></div>
+      <div><label>Cable Length (m)</label><input type="number" id="vd-len" value="50" min="1" /></div>
+    </div>
+    <div class="form-row">
+      <div><label>Cable Size (mm²)</label><input type="number" id="vd-size" value="4" min="0.5" step="0.5" /></div>
+      <div><label>Conductor</label>
+        <select id="vd-mat">
+          <option value="cu">Copper</option>
+          <option value="al">Aluminium</option>
+        </select></div>
+    </div>
+    <div class="form-row">
+      <div><label>System</label>
+        <select id="vd-sys">
+          <option value="single">Single-phase / DC</option>
+          <option value="three">Three-phase</option>
+        </select></div>
+      <div><label>Supply Voltage (V)</label><input type="number" id="vd-v" value="230" min="1" /></div>
+    </div>
+    <button class="btn btn-pink" onclick="calcVD()">Calculate Voltage Drop</button>
+    <div class="result pink" id="vd-result">
+      <div class="result-main" id="vd-output-text">—</div>
+      <div class="result-sub" id="vd-sub-text"></div>
+      <div class="detail-grid" id="vd-details"></div>
+    </div>
+  </div>
+
+</div><!-- end panel-convert -->
+
 <footer>
   For guidance only · Always verify with a qualified electrician<br/>
-  Calculations based on IEC 60364 / NEC 310 references
+  Based on IEC 60364 / NEC 310 / AS/NZS 3008 references
 </footer>
 
 <script>
-// ─── Tab switching ───────────────────────────────────────────────
-function showTab(id) {
+// ── Tab switching ──────────────────────────────────────────────────
+function showTab(id, btn) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('panel-' + id).classList.add('active');
-  event.currentTarget.classList.add('active');
+  btn.classList.add('active');
 }
 
-// ─── Cable size data ─────────────────────────────────────────────
-// [size_mm2, Cu_conduit_A, Cu_free_A, Cu_buried_A]
+// ── Cable data [mm², conduit_A, free_A, buried_A] ─────────────────
 const CABLE_DATA = [
-  [1.5,   13,  17,  18],
-  [2.5,   18,  23,  25],
-  [4,     24,  31,  34],
-  [6,     31,  40,  43],
-  [10,    43,  54,  60],
-  [16,    57,  73,  80],
-  [25,    75,  95, 101],
-  [35,    92, 117, 122],
-  [50,   110, 141, 144],
-  [70,   140, 179, 178],
-  [95,   170, 216, 211],
-  [120,  195, 249, 240],
-  [150,  225, 285, 271],
-  [185,  260, 328, 304],
-  [240,  305, 387, 350],
-  [300,  350, 443, 394],
+  [1.5,13,17,18],[2.5,18,23,25],[4,24,31,34],[6,31,40,43],
+  [10,43,54,60],[16,57,73,80],[25,75,95,101],[35,92,117,122],
+  [50,110,141,144],[70,140,179,178],[95,170,216,211],
+  [120,195,249,240],[150,225,285,271],[185,260,328,304],
+  [240,305,387,350],[300,350,443,394]
 ];
-
-// Al ampacity ≈ 78% of Cu
-const AL_FACTOR = 0.78;
-// Free air derating factors per installation
-function getAmpacity(row, install) {
-  if (install === 'conduit') return row[1];
-  if (install === 'free')    return row[2];
-  return row[3]; // buried
-}
-
-// Resistivity (Ω·mm²/m): Cu=0.0175, Al=0.028
 const RESISTIVITY = { cu: 0.0175, al: 0.028 };
 
+function getAmpacity(row, install) {
+  return install === 'conduit' ? row[1] : install === 'free' ? row[2] : row[3];
+}
+function installLabel(v) {
+  return {conduit:'In conduit',free:'Free air',buried:'Direct buried'}[v];
+}
+
 function calcCable() {
-  const system   = document.getElementById('c-system').value;
-  const voltage  = parseFloat(document.getElementById('c-voltage').value);
-  const kw       = parseFloat(document.getElementById('c-kw').value);
-  const pf       = parseFloat(document.getElementById('c-pf').value);
-  const length   = parseFloat(document.getElementById('c-length').value);
-  const vdPct    = parseFloat(document.getElementById('c-vd').value);
+  const system = document.getElementById('c-system').value;
+  const voltage = +document.getElementById('c-voltage').value;
+  const kw = +document.getElementById('c-kw').value;
+  const pf = +document.getElementById('c-pf').value;
+  const length = +document.getElementById('c-length').value;
+  const vdPct = +document.getElementById('c-vd').value;
   const material = document.getElementById('c-material').value;
-  const install  = document.getElementById('c-install').value;
+  const install = document.getElementById('c-install').value;
+  if (!voltage||!kw||!pf||!length||!vdPct) { alert('Enter valid values.'); return; }
 
-  if ([voltage, kw, pf, length, vdPct].some(isNaN) || voltage <= 0 || kw <= 0 || pf <= 0) {
-    alert('Please enter valid values.'); return;
-  }
-
-  // Full-load current
   let current;
-  if (system === 'single') current = (kw * 1000) / (voltage * pf);
-  else if (system === 'three') current = (kw * 1000) / (Math.sqrt(3) * voltage * pf);
-  else current = (kw * 1000) / voltage; // DC (PF=1 for DC)
+  if (system==='single') current = (kw*1000)/(voltage*pf);
+  else if (system==='three') current = (kw*1000)/(Math.sqrt(3)*voltage*pf);
+  else current = (kw*1000)/voltage;
 
-  // Max allowed volt drop (V)
-  const vdMax = voltage * (vdPct / 100);
-  // Min conductor area for volt drop: A = ρ * L * I * k / Vd
-  // k = 2 for single-phase/DC, √3 for 3-phase
+  const vdMax = voltage*(vdPct/100);
   const rho = RESISTIVITY[material];
-  const k = (system === 'three') ? Math.sqrt(3) : 2;
-  const minAreaVD = (rho * length * current * k) / vdMax;
+  const k = system==='three' ? Math.sqrt(3) : 2;
+  const minAreaVD = (rho*length*current*k)/vdMax;
 
-  // Find cable that satisfies BOTH current capacity and volt drop
   let chosen = null;
   for (const row of CABLE_DATA) {
-    const amp = getAmpacity(row, install) * (material === 'al' ? AL_FACTOR : 1);
-    if (amp >= current && row[0] >= minAreaVD) {
-      chosen = { size: row[0], ampacity: amp };
-      break;
-    }
+    const amp = getAmpacity(row,install)*(material==='al'?0.78:1);
+    if (amp>=current && row[0]>=minAreaVD) { chosen={size:row[0],ampacity:amp}; break; }
   }
 
-  const res    = document.getElementById('cable-result');
+  const res = document.getElementById('cable-result');
   const sizeEl = document.getElementById('cable-size-text');
-  const subEl  = document.getElementById('cable-sub-text');
-  const detEl  = document.getElementById('cable-details');
+  const subEl = document.getElementById('cable-sub-text');
+  const detEl = document.getElementById('cable-details');
   const infoEl = document.getElementById('cable-info');
 
   if (!chosen) {
     sizeEl.textContent = '> 300 mm²';
-    subEl.textContent  = 'Exceeds standard range. Consider multiple parallel cables.';
-    detEl.innerHTML = '';
-    infoEl.innerHTML = '';
+    subEl.textContent = 'Exceeds standard range. Consider parallel cables.';
+    detEl.innerHTML=''; infoEl.innerHTML='';
   } else {
-    const actualVD = (rho * length * current * k * 2) / chosen.size;
-    // actual VD uses 2*length as return path included in formula above
-    const vdV = (rho * k * length * current) / chosen.size;
-    const vdPercent = (vdV / voltage * 100).toFixed(2);
-
-    sizeEl.textContent = `${chosen.size} mm²`;
-    subEl.textContent  = `${material === 'cu' ? 'Copper' : 'Aluminium'} · ${installLabel(install)} · ${system === 'three' ? '3-phase' : system === 'single' ? '1-phase' : 'DC'}`;
-
+    const vdV = (rho*k*length*current)/chosen.size;
+    const vdPctActual = (vdV/voltage*100).toFixed(2);
+    sizeEl.textContent = chosen.size+' mm²';
+    subEl.textContent = (material==='cu'?'Copper':'Aluminium')+' · '+installLabel(install)+' · '+(system==='three'?'3-phase':system==='single'?'1-phase':'DC');
     detEl.innerHTML = `
       <div class="detail-item"><div class="detail-label">Full Load Current</div><div class="detail-value">${current.toFixed(1)} A</div></div>
       <div class="detail-item"><div class="detail-label">Cable Ampacity</div><div class="detail-value">${chosen.ampacity.toFixed(0)} A</div></div>
-      <div class="detail-item"><div class="detail-label">Volt Drop</div><div class="detail-value">${vdPercent}%</div></div>
-      <div class="detail-item"><div class="detail-label">Min Area (VD)</div><div class="detail-value">${minAreaVD.toFixed(2)} mm²</div></div>
-    `;
-
-    infoEl.innerHTML = `
-      <strong>Note:</strong> Size accounts for both current capacity and ${vdPct}% voltage drop limit over ${length} m run.
-      Always apply additional derating for ambient temperature, grouping, and local wiring regulations.
-    `;
+      <div class="detail-item"><div class="detail-label">Voltage Drop</div><div class="detail-value">${vdPctActual}%</div></div>
+      <div class="detail-item"><div class="detail-label">Min Area (VD)</div><div class="detail-value">${minAreaVD.toFixed(2)} mm²</div></div>`;
+    infoEl.innerHTML = `<strong>Note:</strong> Sized for both current capacity and ${vdPct}% VD over ${length} m. Apply additional derating for ambient temp and cable grouping.`;
   }
-
   res.classList.add('show');
 }
 
-function installLabel(v) {
-  return { conduit: 'In conduit', free: 'Free air', buried: 'Direct buried' }[v];
+// ── Breaker ────────────────────────────────────────────────────────
+const IEC_SIZES = [6,10,16,20,25,32,40,50,63,80,100,125,160,200,250,315,400,500,630];
+const NEC_SIZES = [15,20,30,40,50,60,70,80,100,110,125,150,175,200,225,250,300,350,400,450,500,600];
+
+function calcBreaker() {
+  const system = document.getElementById('b-system').value;
+  const voltage = +document.getElementById('b-voltage').value;
+  const kw = +document.getElementById('b-kw').value;
+  const pf = +document.getElementById('b-pf').value;
+  const loadType = document.getElementById('b-loadtype').value;
+  const standard = document.getElementById('b-standard').value;
+  if (!voltage||!kw||!pf) { alert('Enter valid values.'); return; }
+
+  let current;
+  if (system==='single') current = (kw*1000)/(voltage*pf);
+  else if (system==='three') current = (kw*1000)/(Math.sqrt(3)*voltage*pf);
+  else current = (kw*1000)/voltage;
+
+  let mult=1.25, multLabel='125% (continuous)';
+  if (loadType==='hvac') { mult=1.75; multLabel='175% (HVAC/hermetic)'; }
+  const minBreaker = current*mult;
+  const sizes = standard==='iec' ? IEC_SIZES : NEC_SIZES;
+  let recommended = sizes.find(s=>s>=minBreaker) || sizes[sizes.length-1];
+  const recIdx = sizes.indexOf(recommended);
+  const tableRows = sizes.slice(Math.max(0,recIdx-1), recIdx+4);
+
+  let tableHTML = `<table class="data-table"><tr><th>Breaker (A)</th><th>FLC ratio</th><th>Status</th></tr>`;
+  for (const sz of tableRows) {
+    const ratio = (sz/current).toFixed(2);
+    const isTooSmall = sz<minBreaker;
+    const isRec = sz===recommended;
+    tableHTML += `<tr${isRec?' class="highlight"':''}><td>${sz}${isRec?'<span class="tag">✓</span>':''}</td><td>${ratio}×</td><td>${isTooSmall?'❌ Under':''}${isRec?'✅ Recommended':''}${!isTooSmall&&!isRec?'⬆ Next up':''}</td></tr>`;
+  }
+  tableHTML += '</table>';
+
+  document.getElementById('breaker-size-text').textContent = recommended+' A';
+  document.getElementById('breaker-sub-text').textContent = `FLC: ${current.toFixed(1)} A × ${multLabel}`;
+  document.getElementById('breaker-table-wrap').innerHTML = tableHTML;
+  document.getElementById('breaker-info').innerHTML = `<strong>Standard:</strong> ${standard.toUpperCase()} · <strong>Load:</strong> ${loadType} · <strong>Min required:</strong> ${minBreaker.toFixed(1)} A<br/>Confirm with local electrical code and upstream protection.`;
+  document.getElementById('breaker-result').classList.add('show');
 }
 
-// ─── kW ↔ kVA ────────────────────────────────────────────────────
-document.getElementById('kva-dir').addEventListener('change', function() {
-  const lbl = document.getElementById('kva-input-label');
-  lbl.textContent = this.value === 'kw2kva' ? 'Real Power (kW)' : 'Apparent Power (kVA)';
-});
-
+// ── kW ↔ kVA ──────────────────────────────────────────────────────
+function updateKvaLabel() {
+  const dir = document.getElementById('kva-dir').value;
+  document.getElementById('kva-input-label').textContent = dir==='kw2kva' ? 'Real Power (kW)' : 'Apparent Power (kVA)';
+}
 function calcKva() {
-  const dir   = document.getElementById('kva-dir').value;
-  const val   = parseFloat(document.getElementById('kva-input').value);
-  const pf    = parseFloat(document.getElementById('kva-pf').value);
-
-  if (isNaN(val) || isNaN(pf) || val <= 0 || pf <= 0 || pf > 1) {
-    alert('Please enter valid values (PF between 0 and 1).'); return;
-  }
-
-  let result, kw, kva, kvar;
-  if (dir === 'kw2kva') {
-    kva  = val / pf;
-    kw   = val;
-    kvar = Math.sqrt(kva * kva - kw * kw);
-    document.getElementById('kva-output-text').textContent = `${kva.toFixed(3)} kVA`;
-  } else {
-    kw   = val * pf;
-    kva  = val;
-    kvar = Math.sqrt(kva * kva - kw * kw);
-    document.getElementById('kva-output-text').textContent = `${kw.toFixed(3)} kW`;
-  }
-
-  const eff = (pf * 100).toFixed(1);
-  document.getElementById('kva-sub-text').textContent =
-    `Power factor: ${pf} · Efficiency: ${eff}%`;
-
+  const dir = document.getElementById('kva-dir').value;
+  const val = +document.getElementById('kva-input').value;
+  const pf  = +document.getElementById('kva-pf').value;
+  if (!val||!pf||pf>1) { alert('Enter valid values.'); return; }
+  let kw, kva, kvar;
+  if (dir==='kw2kva') { kva=val/pf; kw=val; }
+  else { kw=val*pf; kva=val; }
+  kvar = Math.sqrt(Math.max(0, kva*kva - kw*kw));
+  document.getElementById('kva-output-text').textContent = dir==='kw2kva' ? kva.toFixed(3)+' kVA' : kw.toFixed(3)+' kW';
+  document.getElementById('kva-sub-text').textContent = `Power Factor: ${pf} · Efficiency: ${(pf*100).toFixed(1)}%`;
   document.getElementById('kva-details').innerHTML = `
-    <div class="detail-item"><div class="detail-label">Real Power (kW)</div><div class="detail-value">${kw.toFixed(3)}</div></div>
-    <div class="detail-item"><div class="detail-label">Apparent (kVA)</div><div class="detail-value">${kva.toFixed(3)}</div></div>
-    <div class="detail-item"><div class="detail-label">Reactive (kVAR)</div><div class="detail-value">${kvar.toFixed(3)}</div></div>
-    <div class="detail-item"><div class="detail-label">Power Factor</div><div class="detail-value">${pf.toFixed(2)}</div></div>
-  `;
-
+    <div class="detail-item"><div class="detail-label">Real Power</div><div class="detail-value">${kw.toFixed(3)} kW</div></div>
+    <div class="detail-item"><div class="detail-label">Apparent Power</div><div class="detail-value">${kva.toFixed(3)} kVA</div></div>
+    <div class="detail-item"><div class="detail-label">Reactive Power</div><div class="detail-value">${kvar.toFixed(3)} kVAR</div></div>
+    <div class="detail-item"><div class="detail-label">Power Factor</div><div class="detail-value">${pf.toFixed(2)}</div></div>`;
   document.getElementById('kva-result').classList.add('show');
 }
 
-// ─── Breaker Sizer ───────────────────────────────────────────────
-const IEC_SIZES  = [6,10,16,20,25,32,40,50,63,80,100,125,160,200,250,315,400,500,630];
-const NEC_SIZES  = [15,20,30,40,50,60,70,80,100,110,125,150,175,200,225,250,300,350,400,450,500,600];
+// ── Ohm's Law ──────────────────────────────────────────────────────
+function calcOhm() {
+  const vEl=document.getElementById('o-v'), iEl=document.getElementById('o-i'),
+        rEl=document.getElementById('o-r'), pEl=document.getElementById('o-p');
+  let V=vEl.value!==''?+vEl.value:null, I=iEl.value!==''?+iEl.value:null,
+      R=rEl.value!==''?+rEl.value:null, P=pEl.value!==''?+pEl.value:null;
+  const filled = [V,I,R,P].filter(x=>x!==null).length;
+  if (filled<2) { alert('Enter at least 2 values.'); return; }
 
-function calcBreaker() {
-  const system   = document.getElementById('b-system').value;
-  const voltage  = parseFloat(document.getElementById('b-voltage').value);
-  const kw       = parseFloat(document.getElementById('b-kw').value);
-  const pf       = parseFloat(document.getElementById('b-pf').value);
-  const loadType = document.getElementById('
+  // Solve using all available combinations
+  if (V!==null&&I!==null) { R=R??V/I; P=P??V*I; }
+  if (V!==null&&R!==null) { I=I??V/R; P=P??V*V/R; }
+  if (V!==null&&P!==null) { I=I??P/V; R=R??V*V/P; }
+  if (I!==null&&R!==null) { V=V??I*R; P=P??I*I*R; }
+  if (I!==null&&P!==null) { V=V??P/I; R=R??P/(I*I); }
+  if (R!==null&&P!==null) { V=V??Math.sqrt(P*R); I=I??Math.sqrt(P/R); }
+
+  function fmt(val,unit) {
+    if (val===null||isNaN(val)) return '—';
+    if (Math.abs(val)>=1000) return (val/1000).toFixed(3)+'k'+unit;
+    if (Math.abs(val)<0.01)  return (val*1000).toFixed(3)+'m'+unit;
+    return val.toFixed(4).replace(/\.?0+$/,'')+' '+unit;
+  }
+
+  document.getElementById('ohm-details').innerHTML = `
+    <div class="detail-item"><div class="detail-label">Voltage (V)</div><div class="detail-value">${fmt(V,'V')}</div></div>
+    <div class="detail-item"><div class="detail-label">Current (I)</div><div class="detail-value">${fmt(I,'A')}</div></div>
+    <div class="detail-item"><div class="detail-label">Resistance (R)</div><div class="detail-value">${fmt(R,'Ω')}</div></div>
+    <div class="detail-item"><div class="detail-label">Power (P)</div><div class="detail-value">${fmt(P,'W')}</div></div>`;
+  document.getElementById('ohm-info').innerHTML =
+    `<strong>V=${fmt(V,'V')}</strong> · <strong>I=${fmt(I,'A')}</strong> · <strong>R=${fmt(R,'Ω')}</strong> · <strong>P=${fmt(P,'W')}</strong>`;
+  document.getElementById('ohm-result').classList.add('show');
+}
+function clearOhm() {
+  ['o-v','o-i','o-r','o-p'].forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('ohm-result').classList.remove('show');
+}
+
+// ── Motor FLC ──────────────────────────────────────────────────────
+function toggleMotorInput() {
+  const type = document.getElementById('m-inputtype').value;
+  document.getElementById('m-power-label').textContent = type==='kw' ? 'Motor Power (kW)' : 'Motor Power (HP)';
+}
+function calcMotor() {
+  const inputType = document.getElementById('m-inputtype').value;
+  const powerRaw  = +document.getElementById('m-power').value;
+  const system    = document.getElementById('m-system').value;
+  const voltage   = +document.getElementById('m-voltage').value;
+  const eff       = +document.getElementById('m-eff').value/100;
+  const pf        = +document.getElementById('m-pf').value;
+  if (!powerRaw||!voltage||!eff||!pf) { alert('Enter valid values.'); return; }
+
+  const kw = inputType==='hp' ? powerRaw*0.7457 : powerRaw;
+  const hp = inputType==='hp' ? powerRaw : powerRaw/0.7457;
+  let flc;
+  if (system==='three') flc = (kw*1000)/(Math.sqrt(3)*voltage*pf*eff);
+  else                  flc = (kw*1000)/(voltage*pf*eff);
+
+  const startDOL = flc*7;
+  const startSD  = flc*2.5;
+
+  document.getElementById('motor-flc-text').textContent  = flc.toFixed(2)+' A';
+  document.getElementById('motor-sub-text').textContent  = `${kw.toFixed(2)} kW (${hp.toFixed(2)} HP) · ${system==='three'?'3-phase':'1-phase'} · ${voltage} V`;
+  document.getElementById('motor-details').innerHTML = `
+    <div class="detail-item"><div class="detail-label">Full Load Current</div><div class="detail-value">${flc.toFixed(2)} A</div></div>
+    <div class="detail-item"><div class="detail-label">Power (kW / HP)</div><div class="detail-value">${kw.toFixed(2)} / ${hp.toFixed(2)}</div></div>
+    <div class="detail-item"><div class="detail-label">DOL Start (~7×)</div><div class="detail-value">${startDOL.toFixed(1)} A</div></div>
+    <div class="detail-item"><div class="detail-label">Star-Delta (~2.5×)</div><div class="detail-value">${startSD.toFixed(1)} A</div></div>`;
+  document.getElementById('motor-info').innerHTML =
+    `<strong>Efficiency:</strong> ${(eff*100).toFixed(0)}% · <strong>PF:</strong> ${pf} · <strong>Suggested cable:</strong> size for ${(flc*1.25).toFixed(1)} A (125% FLC)`;
+  document.getElementById('motor-result').classList.add('show');
+}
+
+// ── Transformer ────────────────────────────────────────────────────
+const TX_SIZES = [5,10,15,25,37.5,50,75,100,150,200,250,315,500,630,750,1000,1250,1600,2000,2500];
+function calcTransformer() {
+  const kw     = +document.getElementById('t-kw').value;
+  const pf     = +document.getElementById('t-pf').value;
+  const df     = +document.getElementById('t-df').value/100;
+  const growth = +document.getElementById('t-growth').value/100;
+  const vpri   = +document.getElementById('t-vpri').value;
+  const vsec   = +document.getElementById('t-vsec').value;
+  if (!kw||!pf||!df||!vpri||!vsec) { alert('Enter valid values.'); return; }
+
+  const kva_load    = (kw*df)/pf;
+  const kva_design  = kva_load*(1+growth);
+  const recommended = TX_SIZES.find(s=>s>=kva_design) || TX_SIZES[TX_SIZES.length-1];
+  const ratio       = (vpri/vsec).toFixed(2);
+  const loading     = (kva_design/recommended*100).toFixed(1);
+  const pri_flc     = (recommended*1000)/(Math.sqrt(3)*vpri);
+  const sec_flc     = (recommended*1000)/(Math.sqrt(3)*vsec);
+
+  document.getElementById('transformer-kva-text').textContent = recommended+' kVA';
+  document.getElementById('transformer-sub-text').textContent = `Design load: ${kva_design.toFixed(1)} kVA · Loading: ${loading}%`;
+  document.getElementById('transformer-details').innerHTML = `
+    <div class="detail-item"><div class="detail-label">Load kVA (demand)</div><div class="detail-value">${kva_load.toFixed(1)} kVA</div></div>
+    <div class="detail-item"><div class="detail-label">Design kVA (+growth)</div><div class="detail-value">${kva_design.toFixed(1)} kVA</div></div>
+    <div class="detail-item"><div class="detail-label">Turn Ratio</div><div class="detail-value">${ratio}:1</div></div>
+    <div class="detail-item"><div class="detail-label">% Loading</div><div class="detail-value">${loading}%</div></div>
+    <div class="detail-item"><div class="detail-label">Primary FLC</div><div class="detail-value">${pri_flc.toFixed(1)} A</div></div>
+    <div class="detail-item"><div class="detail-label">Secondary FLC</div><div class="detail-value">${sec_flc.toFixed(1)} A</div></div>`;
+  document.getElementById('transformer-info').innerHTML =
+    `<strong>Demand factor:</strong> ${(df*100).toFixed(0)}% · <strong>Growth allowance:</strong> ${(growth*100).toFixed(0)}%<br/>Optimal loading 70–80% for efficiency and longevity.`;
+  document.getElementById('transformer-result').classList.add('show');
+}
+
+// ── HP ↔ kW ───────────────────────────────────────────────────────
+function updateHpLabel() {
+  const dir = document.getElementById('hp-dir').value;
+  document.getElementById('hp-input-label').textContent = dir==='hp2kw' ? 'Horsepower (HP)' : 'Kilowatts (kW)';
+}
+function calcHp() {
+  const dir = document.getElementById('hp-dir').value;
+  const val = +document.getElementById('hp-input').value;
+  if (!val) { alert('Enter a value.'); return; }
+  let kw, hp;
+  if (dir==='hp2kw') { hp=val; kw=val*0.7457; }
+  else { kw=val; hp=val/0.7457; }
+  document.getElementById('hp-output-text').textContent = dir==='hp2kw' ? kw.toFixed(4)+' kW' : hp.toFixed(4)+' HP';
+  document.getElementById('hp-details').innerHTML = `
+    <div class="detail-item"><div class="detail-label">Horsepower</div><div class="detail-value">${hp.toFixed(4)} HP</div></div>
+    <div class="detail-item"><div class="detail-label">Kilowatts</div><div class="detail-value">${kw.toFixed(4)} kW</div></div>
+    <div class="detail-item"><div class="detail-label">Watts</div><div class="detail-value">${(kw*1000).toFixed(1)} W</div></div>
+    <div class="detail-item"><div class="detail-label">BTU/hr</div><div class="detail-value">${(kw*3412.14).toFixed(0)}</div></div>`;
+  document.getElementById('hp-result').classList.add('show');
+}
+
+// ── kW/kVA → Amps ─────────────────────────────────────────────────
+function calcAmps() {
+  const type   = document.getElementById('amp-type').value;
+  const system = document.getElementById('amp-system').value;
+  const val    = +document.getElementById('amp-val').value;
+  const v      = +document.getElementById('amp-v').value;
+  const pf     = +document.getElementById('amp-pf').value;
+  if (!val||!v||!pf) { alert('Enter valid values.'); return; }
+
+  let amps, kw, kva, label;
+  if (type==='kw') {
+    kw=val; kva=val/pf;
+    if (system==='three') amps=(val*1000)/(Math.sqrt(3)*v*pf);
+    else if (system==='single') amps=(val*1000)/(v*pf);
+    else amps=(val*1000)/v;
+    label = val+' kW → Amps';
+  } else if (type==='kva') {
+    kva=val; kw=val*pf;
+    if (system==='three') amps=(val*1000)/(Math.sqrt(3)*v);
+    else if (system==='single') amps=(val*1000)/v;
+    else amps=(val*1000)/v;
+    label = val+' kVA → Amps';
+  } else {
+    amps=val;
+    if (system==='three') kw=(Math.sqrt(3)*v*amps*pf)/1000;
+    else if (system==='single') kw=(v*amps*pf)/1000;
+    else kw=(v*amps)/1000;
+    kva=kw/pf; label = val+' A → kW';
+  }
+
+  document.getElementById('amp-output-text').textContent =
+    type==='amps' ? kw.toFixed(3)+' kW' : amps.toFixed(2)+' A';
+  document.getElementById('amp-details').innerHTML = `
+    <div class="detail-item"><div class="detail-label">Current</div><div class="detail-value">${amps.toFixed(2)} A</div></div>
+    <div class="detail-item"><div class="detail-label">Voltage</div><div class="detail-value">${v} V</div></div>
+    <div class="detail-item"><div class="detail-label">Real Power</div><div class="detail-value">${kw.toFixed(3)} kW</div></div>
+    <div class="detail-item"><div class="detail-label">Apparent Power</div><div class="detail-value">${kva.toFixed(3)} kVA</div></div>`;
+  document.getElementById('amp-result').classList.add('show');
+}
+
+// ── Efficiency ─────────────────────────────────────────────────────
+function calcEff() {
+  const pin  = +document.getElementById('eff-in').value;
+  const pout = +document.getElementById('eff-out').value;
+  if (!pin||!pout||pout>pin) { alert('Output must be ≤ Input.'); return; }
+  const eff   = (pout/pin)*100;
+  const loss  = pin-pout;
+  const lossPct = (loss/pin)*100;
+  document.getElementById('eff-output-text').textContent = eff.toFixed(2)+'%';
+  document.getElementById('eff-details').innerHTML = `
+    <div class="detail-item"><div class="detail-label">Efficiency</div><div class="detail-value">${eff.toFixed(2)}%</div></div>
+    <div class="detail-item"><div class="detail-label">Losses</div><div class="detail-value">${loss.toFixed(2)} (${lossPct.toFixed(1)}%)</div></div>
+    <div class="detail-item"><div class="detail-label">Input Power</div><div class="detail-value">${pin}</div></div>
+    <div class="detail-item"><div class="detail-label">Output Power</div><div class="detail-value">${pout}</div></div>`;
+  document.getElementById('eff-result').classList.add('show');
+}
+
+// ── Capacitor / PF Correction ──────────────────────────────────────
+function calcCapacitor() {
+  const kw  = +document.getElementById('cap-kw').value;
+  const pf1 = +document.getElementById('cap-pf1').value;
+  const pf2 = +document.getElementById('cap-pf2').value;
+  if (!kw||!pf1||!pf2||pf2<=pf1) { alert('Target PF must be greater than existing PF.'); return; }
+  const kvar = kw*(Math.tan(Math.acos(pf1)) - Math.tan(Math.acos(pf2)));
+  const kva1 = kw/pf1, kva2 = kw/pf2;
+  const kvar1 = Math.sqrt(kva1*kva1-kw*kw);
+  const kvar2 = Math.sqrt(kva2*kva2-kw*kw);
+  document.getElementById('cap-output-text').textContent = kvar.toFixed(2)+' kVAR';
+  document.getElementById('cap-sub-text').textContent = `Install ${kvar.toFixed(2)} kVAR of capacitors to improve PF from ${pf1} → ${pf2}`;
+  document.getElementById('cap-details').innerHTML = `
+    <div class="detail-item"><div class="detail-label">Required kVAR</div><div class="detail-value">${kvar.toFixed(2)} kVAR</div></div>
+    <div class="detail-item"><div class="detail-label">kVA reduction</div><div class="detail-value">${(kva1-kva2).toFixed(2)} kVA</div></div>
+    <div class="detail-item"><div class="detail-label">Before (kVA/kVAR)</div><div class="detail-value">${kva1.toFixed(2)} / ${kvar1.toFixed(2)}</div></div>
+    <div class="detail-item"><div class="detail-label">After (kVA/kVAR)</div><div class="detail-value">${kva2.toFixed(2)} / ${kvar2.toFixed(2)}</div></div>`;
+  document.getElementById('cap-result').classList.add('show');
+}
+
+// ── Voltage Drop (quick) ───────────────────────────────────────────
+function calcVD() {
+  const I    = +document.getElementById('vd-i').value;
+  const len  = +document.getElementById('vd-len').value;
+  const size = +document.getElementById('vd-size').value;
+  const mat  = document.getElementById('vd-mat').value;
+  const sys  = document.getElementById('vd-sys').value;
+  const V    = +document.getElementById('vd-v').value;
+  if (!I||!len||!size||!V) { alert('Enter valid values.'); return; }
+  const rho = RESISTIVITY[mat];
+  const k   = sys==='three' ? Math.sqrt(3) : 2;
+  const vd  = (rho*k*len*I)/size;
+  const vdPct = (vd/V*100);
+  const ok  = vdPct<=3;
+  document.getElementById('vd-output-text').textContent = vd.toFixed(3)+' V ('+vdPct.toFixed(2)+'%)';
+  document.getElementById('vd-sub-text').textContent = ok ? '✅ Within 3% limit' : '⚠️ Exceeds 3% — consider larger cable';
+  document.getElementById('vd-details').innerHTML = `
+    <div class="detail-item"><div class="detail-label">Volt Drop (V)</div><div class="detail-value">${vd.toFixed(3)} V</div></div>
+    <div class="detail-item"><div class="detail-label">Volt Drop (%)</div><div class="detail-value">${vdPct.toFixed(2)}%</div></div>
+    <div class="detail-item"><div class="detail-label">Receiving End V</div><div class="detail-value">${(V-vd).toFixed(1)} V</div></div>
+    <div class="detail-item"><div class="detail-label">Cable Resistance</div><div class="detail-value">${((rho*len)/size).toFixed(4)} Ω</div></div>`;
+  document.getElementById('vd-result').classList.add('show');
+}
+</script>
+</body>
+</html>
